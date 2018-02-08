@@ -1,28 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using LtiLibrary.NetCore.Common;
 using LtiLibrary.NetCore.Extensions;
 using LtiLibrary.NetCore.Lis.v1;
 using LtiLibrary.NetCore.Lti.v1;
 using LtiLibrary.NetCore.OAuth;
+using LtiLibrary.NetCore.Tests.TestHelpers;
 using Xunit;
 
 namespace LtiLibrary.NetCore.Tests
 {
     public class LtiRequestShould
     {
-        [Fact]
-        public void GenerateSignature_IfBasicLaunchRequestHasAllRequiredFields()
-        {
-            var request =
-                new LtiRequest(LtiConstants.BasicLaunchLtiMessageType)
-                {
-                    Url = new Uri("http://lti.tools/test/tp.php"),
-                    ConsumerKey = "12345",
-                    ResourceLinkId = "launch"
-                };
-            request.Signature = request.SubstituteCustomVariablesAndGenerateSignature("secret");
-        }
+        #region Basic Launch Request Tests
 
         [Fact]
         public void ThrowException_IfMessageTypeIsMissing()
@@ -85,6 +76,10 @@ namespace LtiLibrary.NetCore.Tests
             var ex = Assert.Throws<LtiException>(() => request.SubstituteCustomVariablesAndGenerateSignature("secret"));
             Assert.Equal($"Missing parameter(s): {LtiConstants.ResourceLinkIdParameter}.", ex.Message);
         }
+
+        #endregion
+
+        #region Content Item Request Tests
 
         [Fact]
         public void GenerateSignature_IfContentItemLaunchRequestHasAllRequiredFields()
@@ -194,6 +189,23 @@ namespace LtiLibrary.NetCore.Tests
             Assert.Equal($"Missing parameter(s): {LtiConstants.ContentItemPlacementParameter}.", ex.Message);
         }
 
+        #endregion
+
+        #region Signature Tests
+
+        [Fact]
+        public void GenerateSignature_IfBasicLaunchRequestHasAllRequiredFields()
+        {
+            var request =
+                new LtiRequest(LtiConstants.BasicLaunchLtiMessageType)
+                {
+                    Url = new Uri("http://lti.tools/test/tp.php"),
+                    ConsumerKey = "12345",
+                    ResourceLinkId = "launch"
+                };
+            request.Signature = request.SubstituteCustomVariablesAndGenerateSignature("secret");
+        }
+
         [Theory]
         [InlineData("HMAC-SHA1", "Im/RhYIEApfbsy+luuisvQqBjgs=")]
         [InlineData("HMAC-SHA256", "qQbfvgDf7WK/6+6XYCKlpu8klUMjH28NBk/U/CGOGEg=")]
@@ -253,5 +265,141 @@ namespace LtiLibrary.NetCore.Tests
             var signature = request.GenerateSignature("secret");
             Assert.Equal(expectedSignature, signature);
         }
+
+        #endregion
+
+        #region Role Tests
+
+        [Fact]
+        public void SendFullUrnsForNonContextRoles()
+        {
+            var request = new LtiRequest(LtiConstants.BasicLaunchLtiMessageType);
+
+            request.SetRoles(
+                new List<Enum>
+                {
+                    ContextRole.Instructor,
+                    InstitutionalRole.Administrator,
+                    SystemRole.SysAdmin
+                });
+
+            Assert.Equal("Instructor,urn:lti:instrole:ims/lis/Administrator,urn:lti:sysrole:ims/lis/SysAdmin", request.Roles);
+        }
+
+        [Fact]
+        public void CorrectlyInterpretRoles_GivenContextAndNonContextRolesString()
+        {
+            var request = new LtiRequest(LtiConstants.BasicLaunchLtiMessageType)
+            {
+                Roles = "Administrator,Instructor,urn:lti:instrole:ims/lis/Administrator,urn:lti:sysrole:ims/lis/SysAdmin"
+            };
+
+            var roles = request.GetRoles();
+            Assert.Equal(4, roles.Count);
+            Assert.Contains(ContextRole.Administrator, roles);
+            Assert.Contains(ContextRole.Instructor, roles);
+            Assert.Contains(InstitutionalRole.Administrator, roles);
+            Assert.Contains(SystemRole.SysAdmin, roles);
+        }
+
+        #endregion
+
+        #region Custom Parameter Tests
+
+        [Theory]
+        [InlineData("name", "value", "custom_name=value")]
+        [InlineData(" name ", " value ", "custom_name=value")]
+        [InlineData("Review:Chapter", "1.2.56", "custom_review_chapter=1.2.56")]
+        [InlineData("Username", "$User.Username", "custom_username=amiller")]
+        public void AddIndividualCustomParameters(string name, string value, string customParameters)
+        {
+            var request = new TestLtiRequest(LtiConstants.BasicLaunchLtiMessageType)
+            {
+                Url = new Uri("http://lti.tools/test/tp.php"),
+                ConsumerKey = "12345",
+                ResourceLinkId = "launch",
+                UserName = "amiller"
+            };
+            request.AddCustomParameter(name, value);
+            request.SubstituteCustomVariablesAndGenerateSignature("secret");
+            Assert.Equal(customParameters, request.CustomParameters);
+        }
+
+        [Theory]
+        [InlineData("name=value,Review:Chapter=1.2.56", "custom_name=value&custom_review_chapter=1.2.56")]
+        [InlineData("name=value;Review:Chapter=1.2.56", "custom_name=value&custom_review_chapter=1.2.56")]
+        [InlineData("name=value&Review:Chapter=1.2.56", "custom_name=value&custom_review_chapter=1.2.56")]
+        [InlineData("name=value\nReview:Chapter=1.2.56", "custom_name=value&custom_review_chapter=1.2.56")]
+        [InlineData("name=value\r\nReview:Chapter=1.2.56", "custom_name=value&custom_review_chapter=1.2.56")]
+        [InlineData("name=value,Review:Chapter=1.2.56&last=first", "custom_name=value&custom_review_chapter=1.2.56&custom_last=first")]
+        [InlineData("Username=$User.Username,Username=$User.Id", "custom_username=amiller&custom_username=12345")]
+        public void AddMultipleCustomParameters(string customParameters, string expectedCustomParameters)
+        {
+            var request = new TestLtiRequest(LtiConstants.BasicLaunchLtiMessageType)
+            {
+                Url = new Uri("http://lti.tools/test/tp.php"),
+                ConsumerKey = "12345",
+                ResourceLinkId = "launch",
+                UserId = "12345",
+                UserName = "amiller"
+            };
+            request.AddCustomParameters(customParameters);
+            request.SubstituteCustomVariablesAndGenerateSignature("secret");
+            Assert.Equal(expectedCustomParameters, request.CustomParameters);
+        }
+
+        [Fact]
+        public void TreatDuplicateCustomParameterNamesAsSeparateNameValue()
+        {
+            // HTML Form Data treats duplicate inputs as separate name/value pairs
+            //
+            // For example,
+            //
+            // <input type="text" name="firstname" value="Mickey" />
+            // <input type="text" name="lastname" value="Mouse" />
+            // <input type="text" name="lastname" value="Mouse" />
+            //
+            // Results in this Form Data when submitted
+            //
+            // firstname=Mickey&lastname=Mouse&lastname=Mouse
+            //
+            // LtiRequest custom parameters should treat the data the
+            // same way.
+            var request = new TestLtiRequest();
+            request.AddCustomParameter("firstname", "Mickey");
+            request.AddCustomParameter("lastname", "Mouse");
+            request.AddCustomParameter("lastname", "Mouse");
+            Assert.Equal("custom_firstname=Mickey&custom_lastname=Mouse&custom_lastname=Mouse", request.CustomParameters);
+        }
+
+        [Fact]
+        public void TreatDuplicateCustomParametersWithSubstitutionSeparately()
+        {
+            var request = new TestLtiRequest(LtiConstants.BasicLaunchLtiMessageType)
+            {
+                Url = new Uri("http://lti.tools/test/tp.php"),
+                ConsumerKey = "12345",
+                ResourceLinkId = "launch",
+                UserId = "12345",
+                UserName = "amiller"
+            };
+            request.AddCustomParameter("Username", "$User.Username");
+            request.AddCustomParameter("Username", "$User.Id");
+            request.SubstituteCustomVariablesAndGenerateSignature("secret");
+            Assert.Equal("custom_username=amiller&custom_username=12345", request.CustomParameters);
+        }
+
+        [Fact]
+        public void ThrowAnException_IfCustomParameterNameIsNullOrWhitespace()
+        {
+            var request = new LtiRequest();
+            Assert.Throws<ArgumentException>(() => request.AddCustomParameter(null, "value"));
+            Assert.Throws<ArgumentException>(() => request.AddCustomParameter(string.Empty, "value"));
+            Assert.Throws<ArgumentException>(() => request.AddCustomParameter(" ", "value"));
+            Assert.Throws<ArgumentException>(() => request.AddCustomParameters("=value"));
+            Assert.Throws<ArgumentException>(() => request.AddCustomParameters("name=value,=value"));
+        }
+
+        #endregion
     }
 }

@@ -6,8 +6,10 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using LtiLibrary.NetCore.Common;
+using LtiLibrary.NetCore.Extensions;
 using LtiLibrary.NetCore.Lis.v1;
 using LtiLibrary.NetCore.OAuth;
+using Newtonsoft.Json;
 
 namespace LtiLibrary.NetCore.Lti.v1
 {
@@ -15,6 +17,7 @@ namespace LtiLibrary.NetCore.Lti.v1
     /// Represents an IMS LTI request.
     /// </summary>
     [DataContract]
+    [JsonConverter(typeof(LtiRequestJsonConverter))]
     public class LtiRequest 
         : OAuthRequest, IBasicLaunchRequest, IOutcomesManagementRequest, IContentItemSelectionRequest, IContentItemSelection
     {
@@ -105,11 +108,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContextIdParameter];
+                return InternalParameters[LtiConstants.ContextIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContextIdParameter] = value;
+                InternalParameters[LtiConstants.ContextIdParameter] = value;
             }
         }
 
@@ -129,11 +132,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContextIdHistoryParameter];
+                return InternalParameters[LtiConstants.ContextIdHistoryParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContextIdHistoryParameter] = value;
+                InternalParameters[LtiConstants.ContextIdHistoryParameter] = value;
             }
         }
 
@@ -151,11 +154,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContextLabelParameter];
+                return InternalParameters[LtiConstants.ContextLabelParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContextLabelParameter] = value;
+                InternalParameters[LtiConstants.ContextLabelParameter] = value;
             }
         }
 
@@ -173,11 +176,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContextTitleParameter];
+                return InternalParameters[LtiConstants.ContextTitleParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContextTitleParameter] = value;
+                InternalParameters[LtiConstants.ContextTitleParameter] = value;
             }
         }
 
@@ -199,13 +202,13 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Enum.TryParse(Parameters[LtiConstants.ContextTypeParameter], out ContextType contextType)
+                return Enum.TryParse(InternalParameters[LtiConstants.ContextTypeParameter], out ContextType contextType)
                    ? contextType
                    : default(ContextType?);
             }
             set
             {
-                Parameters[LtiConstants.ContextTypeParameter] = Convert.ToString(value);
+                InternalParameters[LtiConstants.ContextTypeParameter] = Convert.ToString(value);
             }
         }
 
@@ -226,11 +229,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LaunchPresentationCssUrlParameter];
+                return InternalParameters[LtiConstants.LaunchPresentationCssUrlParameter];
             }
             set
             {
-                Parameters[LtiConstants.LaunchPresentationCssUrlParameter] = value;
+                InternalParameters[LtiConstants.LaunchPresentationCssUrlParameter] = value;
             }
         }
 
@@ -251,13 +254,13 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Enum.TryParse(Parameters[LtiConstants.LaunchPresentationDocumentTargetParameter], out DocumentTarget presentationTarget)
+                return Enum.TryParse(InternalParameters[LtiConstants.LaunchPresentationDocumentTargetParameter], out DocumentTarget presentationTarget)
                    ? presentationTarget
                    : default(DocumentTarget?);
             }
             set
             {
-                Parameters[LtiConstants.LaunchPresentationDocumentTargetParameter] = Convert.ToString(value);
+                InternalParameters[LtiConstants.LaunchPresentationDocumentTargetParameter] = Convert.ToString(value);
             }
         }
 
@@ -277,13 +280,13 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return int.TryParse(Parameters[LtiConstants.LaunchPresentationHeightParameter], out var value)
+                return int.TryParse(InternalParameters[LtiConstants.LaunchPresentationHeightParameter], out var value)
                     ? value
                     : default(int?);
             }
             set
             {
-                Parameters[LtiConstants.LaunchPresentationHeightParameter] = Convert.ToString(value);
+                InternalParameters[LtiConstants.LaunchPresentationHeightParameter] = Convert.ToString(value);
             }
         }
 
@@ -302,11 +305,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LaunchPresentationLocaleParameter];
+                return InternalParameters[LtiConstants.LaunchPresentationLocaleParameter];
             }
             set
             {
-                Parameters[LtiConstants.LaunchPresentationLocaleParameter] = value;
+                InternalParameters[LtiConstants.LaunchPresentationLocaleParameter] = value;
             }
         }
 
@@ -334,11 +337,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LaunchPresentationReturnUrlParameter];
+                return InternalParameters[LtiConstants.LaunchPresentationReturnUrlParameter];
             }
             set
             {
-                Parameters[LtiConstants.LaunchPresentationReturnUrlParameter] = value;
+                InternalParameters[LtiConstants.LaunchPresentationReturnUrlParameter] = value;
             }
         }
 
@@ -358,13 +361,13 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return int.TryParse(Parameters[LtiConstants.LaunchPresentationWidthParameter], out var value)
+                return int.TryParse(InternalParameters[LtiConstants.LaunchPresentationWidthParameter], out var value)
                     ? value
                     : default(int?);
             }
             set
             {
-                Parameters[LtiConstants.LaunchPresentationWidthParameter] = Convert.ToString(value);
+                InternalParameters[LtiConstants.LaunchPresentationWidthParameter] = Convert.ToString(value);
             }
         }
 
@@ -382,11 +385,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisCourseOfferingSourcedIdParameter];
+                return InternalParameters[LtiConstants.LisCourseOfferingSourcedIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisCourseOfferingSourcedIdParameter] = value;
+                InternalParameters[LtiConstants.LisCourseOfferingSourcedIdParameter] = value;
             }
         }
 
@@ -404,11 +407,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisCourseSectionSourceIdParameter];
+                return InternalParameters[LtiConstants.LisCourseSectionSourceIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisCourseSectionSourceIdParameter] = value;
+                InternalParameters[LtiConstants.LisCourseSectionSourceIdParameter] = value;
             }
         }
 
@@ -426,11 +429,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisPersonContactEmailPrimaryParameter];
+                return InternalParameters[LtiConstants.LisPersonContactEmailPrimaryParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisPersonContactEmailPrimaryParameter] = value;
+                InternalParameters[LtiConstants.LisPersonContactEmailPrimaryParameter] = value;
             }
         }
 
@@ -448,11 +451,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisPersonNameFamilyParameter];
+                return InternalParameters[LtiConstants.LisPersonNameFamilyParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisPersonNameFamilyParameter] = value;
+                InternalParameters[LtiConstants.LisPersonNameFamilyParameter] = value;
             }
         }
 
@@ -470,11 +473,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisPersonNameFullParameter];
+                return InternalParameters[LtiConstants.LisPersonNameFullParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisPersonNameFullParameter] = value;
+                InternalParameters[LtiConstants.LisPersonNameFullParameter] = value;
             }
         }
 
@@ -492,11 +495,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisPersonNameGivenParameter];
+                return InternalParameters[LtiConstants.LisPersonNameGivenParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisPersonNameGivenParameter] = value;
+                InternalParameters[LtiConstants.LisPersonNameGivenParameter] = value;
             }
         }
 
@@ -514,11 +517,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisPersonSourcedIdParameter];
+                return InternalParameters[LtiConstants.LisPersonSourcedIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisPersonSourcedIdParameter] = value;
+                InternalParameters[LtiConstants.LisPersonSourcedIdParameter] = value;
             }
         }
 
@@ -536,11 +539,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LtiMessageTypeParameter];
+                return InternalParameters[LtiConstants.LtiMessageTypeParameter];
             }
             set
             {
-                Parameters[LtiConstants.LtiMessageTypeParameter] = value;
+                InternalParameters[LtiConstants.LtiMessageTypeParameter] = value;
             }
         }
 
@@ -559,11 +562,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LtiVersionParameter];
+                return InternalParameters[LtiConstants.LtiVersionParameter];
             }
             set
             {
-                Parameters[LtiConstants.LtiVersionParameter] = value;
+                InternalParameters[LtiConstants.LtiVersionParameter] = value;
             }
         }
 
@@ -586,11 +589,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.RolesParameter];
+                return InternalParameters[LtiConstants.RolesParameter];
             }
             set
             {
-                Parameters[LtiConstants.RolesParameter] = value;
+                InternalParameters[LtiConstants.RolesParameter] = value;
             }
         }
 
@@ -609,11 +612,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInfoProductFamilyCodeParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInfoProductFamilyCodeParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInfoProductFamilyCodeParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInfoProductFamilyCodeParameter] = value;
             }
         }
 
@@ -632,11 +635,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInfoVersionParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInfoVersionParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInfoVersionParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInfoVersionParameter] = value;
             }
         }
 
@@ -654,11 +657,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInstanceContactEmailParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInstanceContactEmailParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInstanceContactEmailParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInstanceContactEmailParameter] = value;
             }
         }
 
@@ -676,11 +679,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInstanceDescriptionParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInstanceDescriptionParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInstanceDescriptionParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInstanceDescriptionParameter] = value;
             }
         }
 
@@ -704,11 +707,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInstanceGuidParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInstanceGuidParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInstanceGuidParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInstanceGuidParameter] = value;
             }
         }
 
@@ -726,11 +729,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInstanceNameParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInstanceNameParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInstanceNameParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInstanceNameParameter] = value;
             }
         }
 
@@ -748,11 +751,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ToolConsumerInstanceUrlParameter];
+                return InternalParameters[LtiConstants.ToolConsumerInstanceUrlParameter];
             }
             set
             {
-                Parameters[LtiConstants.ToolConsumerInstanceUrlParameter] = value;
+                InternalParameters[LtiConstants.ToolConsumerInstanceUrlParameter] = value;
             }
         }
 
@@ -773,11 +776,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.UserIdParameter];
+                return InternalParameters[LtiConstants.UserIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.UserIdParameter] = value;
+                InternalParameters[LtiConstants.UserIdParameter] = value;
             }
         }
 
@@ -798,11 +801,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.UserImageParameter];
+                return InternalParameters[LtiConstants.UserImageParameter];
             }
             set
             {
-                Parameters[LtiConstants.UserImageParameter] = value;
+                InternalParameters[LtiConstants.UserImageParameter] = value;
             }
         }
 
@@ -825,11 +828,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ResourceLinkDescriptionParameter];
+                return InternalParameters[LtiConstants.ResourceLinkDescriptionParameter];
             }
             set
             {
-                Parameters[LtiConstants.ResourceLinkDescriptionParameter] = value;
+                InternalParameters[LtiConstants.ResourceLinkDescriptionParameter] = value;
             }
         }
 
@@ -849,11 +852,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ResourceLinkIdParameter];
+                return InternalParameters[LtiConstants.ResourceLinkIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.ResourceLinkIdParameter] = value;
+                InternalParameters[LtiConstants.ResourceLinkIdParameter] = value;
             }
         }
 
@@ -873,11 +876,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ResourceLinkIdHistoryParameter];
+                return InternalParameters[LtiConstants.ResourceLinkIdHistoryParameter];
             }
             set
             {
-                Parameters[LtiConstants.ResourceLinkIdHistoryParameter] = value;
+                InternalParameters[LtiConstants.ResourceLinkIdHistoryParameter] = value;
             }
         }
 
@@ -895,11 +898,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ResourceLinkTitleParameter];
+                return InternalParameters[LtiConstants.ResourceLinkTitleParameter];
             }
             set
             {
-                Parameters[LtiConstants.ResourceLinkTitleParameter] = value;
+                InternalParameters[LtiConstants.ResourceLinkTitleParameter] = value;
             }
         }
 
@@ -923,11 +926,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.RoleScopeMentorParameter];
+                return InternalParameters[LtiConstants.RoleScopeMentorParameter];
             }
             set
             {
-                Parameters[LtiConstants.RoleScopeMentorParameter] = value;
+                InternalParameters[LtiConstants.RoleScopeMentorParameter] = value;
             }
         }
 
@@ -958,11 +961,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisOutcomeServiceUrlParameter];
+                return InternalParameters[LtiConstants.LisOutcomeServiceUrlParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisOutcomeServiceUrlParameter] = value;
+                InternalParameters[LtiConstants.LisOutcomeServiceUrlParameter] = value;
             }
         }
 
@@ -984,11 +987,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LisResultSourcedIdParameter];
+                return InternalParameters[LtiConstants.LisResultSourcedIdParameter];
             }
             set
             {
-                Parameters[LtiConstants.LisResultSourcedIdParameter] = value;
+                InternalParameters[LtiConstants.LisResultSourcedIdParameter] = value;
             }
         }
 
@@ -1008,11 +1011,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.AcceptMediaTypesParameter];
+                return InternalParameters[LtiConstants.AcceptMediaTypesParameter];
             }
             set
             {
-                Parameters[LtiConstants.AcceptMediaTypesParameter] = value;
+                InternalParameters[LtiConstants.AcceptMediaTypesParameter] = value;
             }
         }
 
@@ -1025,16 +1028,16 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                if (string.IsNullOrEmpty(Parameters[LtiConstants.AcceptMultipleParameter]))
+                if (string.IsNullOrEmpty(InternalParameters[LtiConstants.AcceptMultipleParameter]))
                 {
                     return null;
                 }
 
-                return bool.TryParse(Parameters[LtiConstants.AcceptMultipleParameter], out var value) && value;
+                return bool.TryParse(InternalParameters[LtiConstants.AcceptMultipleParameter], out var value) && value;
             }
             set
             {
-                Parameters[LtiConstants.AcceptMultipleParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
+                InternalParameters[LtiConstants.AcceptMultipleParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
             }
         }
 
@@ -1047,11 +1050,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.AcceptPresentationDocumentTargetsParameter];
+                return InternalParameters[LtiConstants.AcceptPresentationDocumentTargetsParameter];
             }
             set
             {
-                Parameters[LtiConstants.AcceptPresentationDocumentTargetsParameter] = value;
+                InternalParameters[LtiConstants.AcceptPresentationDocumentTargetsParameter] = value;
             }
         }
 
@@ -1066,16 +1069,16 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                if (string.IsNullOrEmpty(Parameters[LtiConstants.AcceptUnsignedParameter]))
+                if (string.IsNullOrEmpty(InternalParameters[LtiConstants.AcceptUnsignedParameter]))
                 {
                     return null;
                 }
 
-                return bool.TryParse(Parameters[LtiConstants.AcceptUnsignedParameter], out var value) && value;
+                return bool.TryParse(InternalParameters[LtiConstants.AcceptUnsignedParameter], out var value) && value;
             }
             set
             {
-                Parameters[LtiConstants.AcceptUnsignedParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
+                InternalParameters[LtiConstants.AcceptUnsignedParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
             }
         }
 
@@ -1089,16 +1092,16 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                if (string.IsNullOrEmpty(Parameters[LtiConstants.AutoCreateParameter]))
+                if (string.IsNullOrEmpty(InternalParameters[LtiConstants.AutoCreateParameter]))
                 {
                     return null;
                 }
 
-                return bool.TryParse(Parameters[LtiConstants.AutoCreateParameter], out var value) && value;
+                return bool.TryParse(InternalParameters[LtiConstants.AutoCreateParameter], out var value) && value;
             }
             set
             {
-                Parameters[LtiConstants.AutoCreateParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
+                InternalParameters[LtiConstants.AutoCreateParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
             }
         }
 
@@ -1116,16 +1119,16 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                if (string.IsNullOrEmpty(Parameters[LtiConstants.CanConfirmParameter]))
+                if (string.IsNullOrEmpty(InternalParameters[LtiConstants.CanConfirmParameter]))
                 {
                     return null;
                 }
 
-                return bool.TryParse(Parameters[LtiConstants.CanConfirmParameter], out var value) && value;
+                return bool.TryParse(InternalParameters[LtiConstants.CanConfirmParameter], out var value) && value;
             }
             set
             {
-                Parameters[LtiConstants.CanConfirmParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
+                InternalParameters[LtiConstants.CanConfirmParameter] = value.HasValue ? value.ToString().ToLowerInvariant() : null;
             }
         }
 
@@ -1138,11 +1141,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContentItemReturnUrlParameter];
+                return InternalParameters[LtiConstants.ContentItemReturnUrlParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContentItemReturnUrlParameter] = value;
+                InternalParameters[LtiConstants.ContentItemReturnUrlParameter] = value;
             }
         }
 
@@ -1154,11 +1157,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContentItemDataParameter];
+                return InternalParameters[LtiConstants.ContentItemDataParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContentItemDataParameter] = value;
+                InternalParameters[LtiConstants.ContentItemDataParameter] = value;
             }
         }
 
@@ -1170,11 +1173,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContentItemTextParameter];
+                return InternalParameters[LtiConstants.ContentItemTextParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContentItemTextParameter] = value;
+                InternalParameters[LtiConstants.ContentItemTextParameter] = value;
             }
         }
 
@@ -1187,11 +1190,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContentItemTitleParameter];
+                return InternalParameters[LtiConstants.ContentItemTitleParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContentItemTitleParameter] = value;
+                InternalParameters[LtiConstants.ContentItemTitleParameter] = value;
             }
         }
 
@@ -1210,11 +1213,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ConfirmUrlParameter];
+                return InternalParameters[LtiConstants.ConfirmUrlParameter];
             }
             set
             {
-                Parameters[LtiConstants.ConfirmUrlParameter] = value;
+                InternalParameters[LtiConstants.ConfirmUrlParameter] = value;
             }
         }
 
@@ -1227,11 +1230,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.ContentItemPlacementParameter];
+                return InternalParameters[LtiConstants.ContentItemPlacementParameter];
             }
             set
             {
-                Parameters[LtiConstants.ContentItemPlacementParameter] = value;
+                InternalParameters[LtiConstants.ContentItemPlacementParameter] = value;
             }
         }
 
@@ -1243,11 +1246,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LtiErrorLogParameter];
+                return InternalParameters[LtiConstants.LtiErrorLogParameter];
             }
             set
             {
-                Parameters[LtiConstants.LtiErrorLogParameter] = value;
+                InternalParameters[LtiConstants.LtiErrorLogParameter] = value;
             }
         }
 
@@ -1259,11 +1262,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LtiErrorMsgParameter];
+                return InternalParameters[LtiConstants.LtiErrorMsgParameter];
             }
             set
             {
-                Parameters[LtiConstants.LtiErrorMsgParameter] = value;
+                InternalParameters[LtiConstants.LtiErrorMsgParameter] = value;
             }
         }
 
@@ -1275,11 +1278,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LtiLogParameter];
+                return InternalParameters[LtiConstants.LtiLogParameter];
             }
             set
             {
-                Parameters[LtiConstants.LtiLogParameter] = value;
+                InternalParameters[LtiConstants.LtiLogParameter] = value;
             }
         }
 
@@ -1291,11 +1294,11 @@ namespace LtiLibrary.NetCore.Lti.v1
         {
             get
             {
-                return Parameters[LtiConstants.LtiMsgParameter];
+                return InternalParameters[LtiConstants.LtiMsgParameter];
             }
             set
             {
-                Parameters[LtiConstants.LtiMsgParameter] = value;
+                InternalParameters[LtiConstants.LtiMsgParameter] = value;
             }
         }
 
@@ -2181,7 +2184,88 @@ namespace LtiLibrary.NetCore.Lti.v1
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Get a list of LTI parameters in the current LtiRequest.
+        /// </summary>
+        public KeyValuePair<string, string>[] Parameters
+        {
+            get
+            {
+                var parameters = new List<KeyValuePair<string, string>>();
+                foreach (var name in InternalParameters.AllKeys)
+                {
+                    var values = InternalParameters.GetValues(name);
+                    if (values != null)
+                    {
+                        foreach (var value in values)
+                        {
+                            parameters.Add(new KeyValuePair<string, string>(name, value));
+                        }
+                    }
+                }
+
+                return parameters.ToArray();
+            }
+        }
+
+        #endregion
+
         #region Methods
+
+        /// <summary>
+        /// Add a single parameter to the current LtiRequest.
+        /// </summary>
+        public void AddParameter(string name, string value)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException($"{nameof(name)} cannot be null, empty, or consist only of whitespace characters.");
+            }
+
+            if (value == null)
+            {
+                throw new ArgumentException($"{nameof(value)} cannot be null.");
+            }
+
+            // Trim any whitespace that surrounds the name
+            name = name.Trim();
+
+            // Trim any whitespace that surrounds the value
+            value = value.Trim();
+
+            // At this point the value may contain custom substitution
+            // variables. They will be substituted immediately before launch.
+            InternalParameters.Add(name, value);
+        }
+
+        /// <summary>
+        /// Add custom parameters to the LtiRequest. The name/value pairs can be
+        /// separated by commas, semicolons, ampersands, or line breaks. If you need
+        /// to include one of those characters in the value, use <see cref="AddCustomParameter"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use <see cref="SetCustomParameters"/> to replace the custom paramters in the
+        /// LtiRequest.
+        /// </remarks>
+        public void AddCustomParameters(string parameters)
+        {
+            if (!string.IsNullOrWhiteSpace(parameters))
+            {
+                var customParams = parameters.Split(new[] { ",", ";", "\r\n", "\n", "&" },
+                    StringSplitOptions.RemoveEmptyEntries);
+                foreach (var customParam in customParams)
+                {
+                    var namevalue = customParam.Split(new[] { "=" },
+                        StringSplitOptions.None);
+                    if (namevalue.Length == 2)
+                    {
+                        AddCustomParameter(namevalue[0], namevalue[1]);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Add a custom parameter to the LtiRequest.
@@ -2192,6 +2276,19 @@ namespace LtiLibrary.NetCore.Lti.v1
         /// <param name="value">The value of the custom parameter.</param>
         public void AddCustomParameter(string name, string value)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException($"{nameof(name)} cannot be null, empty, or consist only of whitespace characters.");
+            }
+
+            if (value == null)
+            {
+                throw new ArgumentException($"{nameof(value)} cannot be null.");
+            }
+
+            // Trim any whitespace that surrounds the name
+            name = name.Trim();
+
             // Per the LTI 1.x specs, custom parameter
             // names must be lowercase letters or numbers. Any other
             // character is replaced with an underscore.
@@ -2200,31 +2297,8 @@ namespace LtiLibrary.NetCore.Lti.v1
             {
                 name = string.Concat("custom_", name);
             }
-            // At this point the value may contain custom substitution
-            // variables. They will be substituted immediately before launch.
-            Parameters.Add(name, value);
-        }
 
-        /// <summary>
-        /// Add the custom parameters from a string.
-        /// </summary>
-        /// <param name="parameters"></param>
-        public void AddCustomParameters(string parameters)
-        {
-            if (!string.IsNullOrWhiteSpace(parameters))
-            {
-                var customParams = parameters.Split(new[] { ",", "\r\n", "\n" },
-                    StringSplitOptions.RemoveEmptyEntries);
-                foreach (var customParam in customParams)
-                {
-                    var namevalue = customParam.Split(new[] { "=" },
-                        StringSplitOptions.RemoveEmptyEntries);
-                    if (namevalue.Length == 2)
-                    {
-                        AddCustomParameter(namevalue[0], namevalue[1]);
-                    }
-                }
-            }
+            AddParameter(name, value);
         }
 
         /// <summary>
@@ -2278,28 +2352,26 @@ namespace LtiLibrary.NetCore.Lti.v1
         }
 
         /// <summary>
-        /// Get the roles in the LtiRequest as an IList of LtiRoles.
+        /// Get the roles in the LtiRequest as an IList of ContextRole, InstitutionalRole, and SystemRole enums.
         /// </summary>
-        /// <returns></returns>
-        public IList<Role> GetRoles()
+        public IList<Enum> GetRoles()
         {
-            var roles = new List<Role>();
-            var value = Parameters[LtiConstants.RolesParameter];
-            if (string.IsNullOrWhiteSpace(value))
+            var roles = new List<Enum>();
+            if (string.IsNullOrWhiteSpace(Roles))
             {
                 return roles;
             }
-            foreach (var roleName in value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var roleValue in Roles.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                if (Enum.TryParse(roleName, true, out Role role))
+                if (Enum.TryParse(roleValue, true, out ContextRole role))
                 {
                     roles.Add(role);
                 }
                 else
                 {
-                    if (LtiConstants.RoleUrns.ContainsKey(roleName))
+                    if (LtiConstants.RoleUrns.ContainsKey(roleValue))
                     {
-                        roles.Add(LtiConstants.RoleUrns[roleName]);
+                        roles.Add(LtiConstants.RoleUrns[roleValue]);
                     }
                 }
             }
@@ -2313,7 +2385,7 @@ namespace LtiLibrary.NetCore.Lti.v1
         /// <param name="parameters">The list of parameter names to check.</param>
         public void RequireAllOf(IEnumerable<string> parameters)
         {
-            var missing = parameters.Where(parameter => string.IsNullOrWhiteSpace(Parameters[parameter])).ToList();
+            var missing = parameters.Where(parameter => string.IsNullOrWhiteSpace(InternalParameters[parameter])).ToList();
 
             if (missing.Count > 0)
             {
@@ -2323,12 +2395,45 @@ namespace LtiLibrary.NetCore.Lti.v1
         }
 
         /// <summary>
-        /// Set the roles in the LtiRequest from an IList of LtiRoles.
+        /// Replace the custom_ and ext_ parameters of the <see cref="LtiRequest"/>. Use 
+        /// <see cref="Lti.v1.LtiRequest.AddCustomParameters"/> to add custom parameters.
         /// </summary>
-        /// <param name="roles">An IList of LtiRoles.</param>
-        public void SetRoles(IList<Role> roles)
+        public void SetCustomParameters(string parameters)
         {
-            Roles = roles.Any() ? string.Join(",", roles.ToList()) : string.Empty;
+            // Remove all the existing custom parameters
+            foreach (var name in InternalParameters.AllKeys)
+            {
+                if (name.StartsWith("custom_") || name.StartsWith("ext_"))
+                {
+                    InternalParameters.Remove(name);
+                }
+            }
+            // Add the new custom_ and _ext parameters
+            AddCustomParameters(parameters);
+        }
+
+        /// <summary>
+        /// Set the roles in the LtiRequest from an IList of ContextRole, InstitutionalRole, and SystemRole.
+        /// </summary>
+        public void SetRoles(IList<Enum> roleEnums)
+        {
+            var roles = new List<string>();
+            foreach (var roleEnum in roleEnums)
+            {
+                if (roleEnum is ContextRole)
+                {
+                    roles.Add(roleEnum.ToString());
+                }
+                else
+                {
+                    var urn = roleEnum.GetUrn();
+                    if (!string.IsNullOrEmpty(urn))
+                    {
+                        roles.Add(urn);
+                    }
+                }
+            }
+            Roles = roles.Any() ? string.Join(",", roles) : string.Empty;
         }
 
         /// <summary>
@@ -2477,15 +2582,29 @@ namespace LtiLibrary.NetCore.Lti.v1
 
         private void SubstituteCustomVariables(NameValueCollection parameters)
         {
-            foreach (var key in parameters.AllKeys)
+            foreach (var name in parameters.AllKeys)
             {
-                if (key.StartsWith("custom_"))
+                if (name.StartsWith("custom_"))
                 {
-                    // Per the LTI 1.x specs, custom parameter
-                    // names must be lowercase letters or numbers. Any other
-                    // character is replaced with an underscore.
-                    var value = SubstituteCustomVariable(parameters[key]);
-                    Parameters[key] = value;
+                    var oldValues = parameters.GetValues(name);
+                    var newValues = new List<string>();
+                    InternalParameters.Remove(name);
+
+                    if (oldValues != null)
+                    {
+                        foreach (var oldValue in oldValues)
+                        {
+                            // Per the LTI 1.x specs, custom parameter
+                            // names must be lowercase letters or numbers. Any other
+                            // character is replaced with an underscore.
+                            newValues.Add(SubstituteCustomVariable(oldValue));
+                        }
+                    }
+
+                    foreach (var newValue in newValues)
+                    {
+                        AddCustomParameter(name, newValue);
+                    }
                 }
             }
         }
@@ -2495,7 +2614,7 @@ namespace LtiLibrary.NetCore.Lti.v1
             // Create a copy of the parameters (getters should not change the object and this
             // getter changes the parameters to eliminate empty/null values and make custom
             // parameter substitutions)
-            var parameters = new NameValueCollection(Parameters);
+            var parameters = new NameValueCollection(InternalParameters);
 
             // Remove empty/null parameters
             foreach (var key in parameters.AllKeys.Where(key => string.IsNullOrWhiteSpace(parameters[key])))
